@@ -13,5 +13,5 @@ setuptools.setup(
     url='https://github.com/lcalcaterra/A17-MLstarter',
     license='MIT',
     packages=['A17'],
-    install_requires=['numpy', 'pandas', 'sklearn', 'xgboost', 'optuna', 'warnings'],
+    install_requires=['numpy', 'pandas', 'sklearn', 'xgboost', 'optuna'],
 )
