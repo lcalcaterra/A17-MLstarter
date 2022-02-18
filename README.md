@@ -35,6 +35,13 @@ I performed encoding with sklearn LabelEncoder as the models (Regression version
     I setted it to -1 (all cores), but you could choose a value between 1 and the max of your cores.
 
 
-This is what I usually do in my daily work, you could create a different model with your pipeline. I created only a base version and in the next weeks I hope to update this project with more features.
+This is what I usually do in my daily work, you could create a different model with your pipeline. I created only a base version and in the next weeks (or months) I hope to update this project with more features.
+
+## Use it on your script or Notebook running this command
+Use pip to intall it like below. 
+```bash
+pip install git+https://github.com/lcalcaterra/A17-MLstarter
+```
+
 
 ### I hope you enjoyed it!
