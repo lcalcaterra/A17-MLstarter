@@ -42,6 +42,13 @@ Use pip to intall it like below.
 ```bash
 pip install git+https://github.com/lcalcaterra/A17-MLstarter
 ```
+And import the model from in a notebook7script:
+```
+from A17.a17 import A17
 
+reg = A17()
+reg.fit(X_train, y_train)
+y_pred = reg.predict(X_test)
+```
 
 ### I hope you enjoyed it!
