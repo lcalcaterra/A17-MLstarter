@@ -42,7 +42,7 @@ Use pip to intall it like below.
 ```bash
 pip install git+https://github.com/lcalcaterra/A17-MLstarter
 ```
-And import the model from in a notebook7script:
+And import the model from in a notebook/script:
 ```
 from A17.a17 import A17
 
