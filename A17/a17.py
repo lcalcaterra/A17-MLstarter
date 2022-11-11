@@ -1,40 +1,28 @@
 """
-First of all, I want to be sure that all needed libraries are installed.
-And if not, I need to install them.
+The packages needed are installed due to setup.py
 """
-import sys
-import pip
+
 import os
-
-packages = ['numpy', 'pandas', 'sklearn', 'xgboost', 'optuna']
-
-for pack in packages:
-    if not pack in sys.modules.keys():
-        if (pack == 'xgboost') | (pack == 'optuna') :
-            os.system(f'conda install -c conda-forge {pack}')
-        else:
-            os.system(f'pip install {pack}')
-
-
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
-from xgboost import XGBRegressor, XGBClassifier
-from sklearn.metrics import mean_squared_log_error
+from sklearn.preprocessing import LabelEncoder
+from xgboost import XGBClassifier, XGBRegressor, plot_importance
 import optuna
-
 
 """
 Here I ignore warning messages
 """
 import warnings
+
 warnings.filterwarnings("ignore")
 
 """
 Find the number of cpu cores
 """
 import multiprocessing
+
 cpus = multiprocessing.cpu_count()
 
 l = list(range(1, cpus + 1))
@@ -58,7 +46,10 @@ class A17():
       self.enc_ = None
       self.fitted_ = None
       self.predicted_ = None
-      self.log_rmse = None
+      self.rmse = None
+      self.feature_importances_ = None
+      self.plot_feature_importances_ = None
+      self.optimised_reg = None
       self.task = task
       self.objective = objective
       self.trials = trials
@@ -79,7 +70,15 @@ class A17():
       except ValueError as e:
           print(e)
 
-          
+
+      if self.task == "regression":
+            self.optimised_reg = XGBRegressor()
+      elif (self.task == "classification") & (self.objective == "binary:logistic"):
+            self.optimised_reg = XGBClassifier(objective = self.objective)
+      else:
+            self.optimised_reg = XGBClassifier(objective = self.objective)
+
+
   def __repr__(self):
       return "This is my AUTOML Model. The model can perform both Regression and Classification tasks."
 
@@ -136,12 +135,12 @@ class A17():
               
               regr.fit(X_train, y_train)
               y_pred = regr.predict(X_val)
-              self.log_rmse = np.sqrt(mean_squared_log_error(y_val, abs(y_pred))) # RITORNIAMO IL log_rmse
-              return np.sqrt(mean_squared_log_error(y_val, abs(y_pred))) #RMSE_log
+              self.rmse = np.sqrt(mean_squared_error(y_val, abs(y_pred))) # RITORNIAMO IL rmse
+              return np.sqrt(mean_squared_error(y_val, abs(y_pred))) #RMSE
           
               
           #Execute optuna and set hyperparameters
-          study = optuna.create_study(direction='minimize')
+          study = optuna.create_study(direction='minimize', pruner = optuna.pruners.MedianPruner())
           study.optimize(objective, n_trials = self.trials)
   
           #Create an instance with tuned hyperparameters
@@ -154,6 +153,8 @@ class A17():
           
           optimised_reg.fit(X_train ,y_train)
           self.fitted_ = optimised_reg # save fitted model into attribute
+          self.feature_importances_ = optimised_reg.feature_importances_
+          self.plot_feature_importances_ = plot_importance(optimised_reg)
     
       elif (self.task == "classification") & (self.objective == "binary:logistic"):
 
@@ -175,12 +176,12 @@ class A17():
               
               regr.fit(X_train, y_train)
               y_pred = regr.predict(X_val)
-              self.log_rmse = np.sqrt(mean_squared_log_error(y_val, abs(y_pred))) # RITORNIAMO IL log_rmse
-              return np.sqrt(mean_squared_log_error(y_val, abs(y_pred))) #RMSE_log
+              self.rmse = np.sqrt(mean_squared_error(y_val, abs(y_pred))) # RITORNIAMO IL rmse
+              return np.sqrt(mean_squared_error(y_val, abs(y_pred))) #RMSE
           
               
           #Execute optuna and set hyperparameters
-          study = optuna.create_study(direction='minimize')
+          study = optuna.create_study(direction='minimize', pruner = optuna.pruners.MedianPruner())
           study.optimize(objective, n_trials = self.trials)
   
           #Create an instance with tuned hyperparameters
@@ -194,6 +195,8 @@ class A17():
           
           optimised_reg.fit(X_train ,y_train)
           self.fitted_ = optimised_reg # save fitted model into attribute
+          self.feature_importances_ = optimised_reg.feature_importances_
+          self.plot_feature_importances_ = plot_importance(optimised_reg)
 
 
       elif (self.task == "classification") & (self.objective == "multi:softmax"):
@@ -216,12 +219,12 @@ class A17():
               
               regr.fit(X_train, y_train)
               y_pred = regr.predict(X_val)
-              self.log_rmse = np.sqrt(mean_squared_log_error(y_val, abs(y_pred))) # RITORNIAMO IL log_rmse
-              return np.sqrt(mean_squared_log_error(y_val, abs(y_pred))) #RMSE_log
+              self.rmse = np.sqrt(mean_squared_error(y_val, abs(y_pred))) # RITORNIAMO IL rmse
+              return np.sqrt(mean_squared_error(y_val, abs(y_pred))) #RMSE
           
               
           #Execute optuna and set hyperparameters
-          study = optuna.create_study(direction='minimize')
+          study = optuna.create_study(direction='minimize', pruner = optuna.pruners.MedianPruner())
           study.optimize(objective, n_trials = self.trials)
   
           #Create an instance with tuned hyperparameters
@@ -235,6 +238,8 @@ class A17():
           
           optimised_reg.fit(X_train ,y_train)
           self.fitted_ = optimised_reg # save fitted model into attribute
+          self.feature_importances_ = optimised_reg.feature_importances_
+          self.plot_feature_importances_ = plot_importance(optimised_reg)
       
       else:
           if (self.task != "regression") | (self.task != "classification"):
@@ -274,3 +279,25 @@ class A17():
       self.predicted_ = opt_reg.predict(X) # save predictions in model attribute
   
       return self.predicted_
+
+
+  def save_model(self, file_name):
+      """
+      Here I save the model in json or txt format
+      """
+      try:
+        opt_reg = self.fitted_
+        opt_reg.save_model(file_name)
+      except:
+        print("Have you fitted the model?")
+
+
+  def load_model(self, file_name):
+      """
+      Here I load the model in json or txt format
+      """
+      if os.path.isfile(file_name)  == True:
+        self.optimised_reg.load_model(file_name)
+        self.fitted_ = self.optimised_reg
+      else:
+        print("I can't find the file")

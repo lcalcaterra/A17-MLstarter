@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name='A17',
-    version='0.0.1',
+    version='0.0.2',
     author='Luca Calcaterra',
     description='AUTOML model for Regression and Classification',
     long_description=long_description,
