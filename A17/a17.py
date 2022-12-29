@@ -46,7 +46,7 @@ class A17():
       self.enc_ = None
       self.fitted_ = None
       self.predicted_ = None
-      self.rmse = None
+      self.mse = None
       self.feature_importances_ = None
       self.plot_feature_importances_ = None
       self.optimised_reg = None
@@ -135,8 +135,8 @@ class A17():
               
               regr.fit(X_train, y_train)
               y_pred = regr.predict(X_val)
-              self.rmse = np.sqrt(mean_squared_error(y_val, abs(y_pred))) # RITORNIAMO IL rmse
-              return np.sqrt(mean_squared_error(y_val, abs(y_pred))) #RMSE
+              self.mse = mean_squared_error(y_val, y_pred) # RITORNIAMO IL mse
+              return mean_squared_error(y_val, y_pred) #mse
           
               
           #Execute optuna and set hyperparameters
@@ -176,8 +176,8 @@ class A17():
               
               regr.fit(X_train, y_train)
               y_pred = regr.predict(X_val)
-              self.rmse = np.sqrt(mean_squared_error(y_val, abs(y_pred))) # RITORNIAMO IL rmse
-              return np.sqrt(mean_squared_error(y_val, abs(y_pred))) #RMSE
+              self.mse = mean_squared_error(y_val, y_pred) # RITORNIAMO IL mse
+              return mean_squared_error(y_val, y_pred) #mse
           
               
           #Execute optuna and set hyperparameters
@@ -219,8 +219,8 @@ class A17():
               
               regr.fit(X_train, y_train)
               y_pred = regr.predict(X_val)
-              self.rmse = np.sqrt(mean_squared_error(y_val, abs(y_pred))) # RITORNIAMO IL rmse
-              return np.sqrt(mean_squared_error(y_val, abs(y_pred))) #RMSE
+              self.mse = mean_squared_error(y_val, y_pred) # RITORNIAMO IL mse
+              return mean_squared_error(y_val, y_pred) #mse
           
               
           #Execute optuna and set hyperparameters
